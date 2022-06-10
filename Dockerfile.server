@@ -1,0 +1,28 @@
+ARG GO_VERSION=1.18.3
+FROM golang:${GO_VERSION}-alpine AS build
+
+RUN addgroup -S server \
+    && adduser -S -u 10000 -g server server
+
+RUN apk add --no-cache git ca-certificates
+
+WORKDIR /src
+
+COPY ./go.mod ./go.sum ./
+RUN go mod download
+
+COPY ./ ./
+
+RUN CGO_ENABLED=0 go build \
+	-installsuffix 'static' \
+	-o /server ./cmd/server
+
+FROM alpine AS final
+
+COPY --from=build /server /server
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /etc/passwd /etc/passwd
+
+USER server
+
+ENTRYPOINT ["/server"]
