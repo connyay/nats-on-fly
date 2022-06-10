@@ -4,7 +4,9 @@ NATS_APP_NAME ?= $(NAME_PREFIX)nats
 NATS_SURVEYOR_APP_NAME ?= $(NAME_PREFIX)nats-surveyor
 CLIENT_APP_NAME ?= $(NAME_PREFIX)client
 SERVER_APP_NAME ?= $(NAME_PREFIX)server
+GRAFANA_NEED_VOLUME ?=
 GRAFANA_APP_NAME ?= $(NAME_PREFIX)grafana
+PROMETHEUS_API_TOKEN ?=
 CLIENT_COUNT ?= 1
 
 docker: nof-client nof-server
@@ -37,7 +39,12 @@ deploy-server:
 	fly deploy --config deployment/server/fly.toml --app $(SERVER_APP_NAME)
 
 deploy-grafana:
+ifneq ($(PROMETHEUS_API_TOKEN), )
+	fly secrets set --app $(GRAFANA_APP_NAME) PROMETHEUS_API_TOKEN=$(PROMETHEUS_API_TOKEN)
+endif
+ifneq ($(GRAFANA_NEED_VOLUME), )
 	fly volumes create grafana_storage --app $(GRAFANA_APP_NAME) --region ord
+endif
 	cd deployment/grafana && \
 		fly deploy --app $(GRAFANA_APP_NAME)
 

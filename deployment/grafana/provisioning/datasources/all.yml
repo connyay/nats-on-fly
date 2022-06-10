@@ -9,4 +9,8 @@ datasources:
   url: 'https://api.fly.io/prometheus/personal'
   isDefault: true
   version: 1
-  editable: true
+  editable: false
+  jsonData:
+      httpHeaderName1: 'Authorization'
+  secureJsonData:
+      httpHeaderValue1: 'Bearer $PROMETHEUS_API_TOKEN'
