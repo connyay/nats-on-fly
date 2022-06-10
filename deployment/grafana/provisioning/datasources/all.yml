@@ -1,0 +1,12 @@
+# config file version
+apiVersion: 1
+
+datasources:
+- name: Prometheus
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: 'https://api.fly.io/prometheus/personal'
+  isDefault: true
+  version: 1
+  editable: true
